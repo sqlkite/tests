@@ -14,6 +14,8 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
+type Handler func(*fasthttp.RequestCtx)
+
 func Req(t *testing.T) RequestBuilder {
 	return RequestBuilder{
 		t:       t,
@@ -23,7 +25,7 @@ func Req(t *testing.T) RequestBuilder {
 	}
 }
 
-// Most cases should generates a respins from a Req, but some cases will want
+// Most cases should generates a response from a Req, but some cases will want
 // to test an http.Response directly
 func Response(t *testing.T, res http.Response) response {
 	conn := &fasthttp.RequestCtx{}
@@ -83,33 +85,25 @@ func (r RequestBuilder) Host(host string) RequestBuilder {
 	return r
 }
 
-func (r RequestBuilder) Get(handler interface{}) response {
+func (r RequestBuilder) Get(handler Handler) response {
 	return r.Method("GET").Request(handler)
 }
 
-func (r RequestBuilder) Post(handler interface{}) response {
+func (r RequestBuilder) Post(handler Handler) response {
 	return r.Method("POST").Request(handler)
 }
 
-func (r RequestBuilder) Put(handler interface{}) response {
+func (r RequestBuilder) Put(handler Handler) response {
 	return r.Method("PUT").Request(handler)
 }
 
-func (r RequestBuilder) Delete(handler interface{}) response {
+func (r RequestBuilder) Delete(handler Handler) response {
 	return r.Method("DELETE").Request(handler)
 }
 
-func (r RequestBuilder) Request(handler interface{}) response {
+func (r RequestBuilder) Request(handler Handler) response {
 	conn := r.Conn()
-
-	switch h := handler.(type) {
-	case func(*fasthttp.RequestCtx):
-		h(conn)
-		return Res(r.t, conn)
-	default:
-		panic(fmt.Sprintf("unknown handler type: %T", handler))
-	}
-
+	handler(conn)
 	return Res(r.t, conn)
 }
 
@@ -154,23 +148,40 @@ func Res(t *testing.T, conn *fasthttp.RequestCtx) response {
 		headers[string(key)] = string(value)
 	})
 
+	status := res.StatusCode()
+
+	// if we have a validation error, let's parse them into a lookup
+	// of field => code
+	var validations map[string][]typed.Typed
+	if status == 400 && json.Int("code") == 2005 {
+		o := json.Objects("invalid")
+		validations = make(map[string][]typed.Typed, len(o))
+		for _, o := range o {
+			field := o.String("field")
+			validations[field] = append(validations[field], o)
+		}
+	}
+
 	return response{
 		t:             t,
 		Json:          json,
 		Headers:       headers,
 		Body:          string(body),
-		Status:        res.StatusCode(),
+		Status:        status,
+		Validations:   validations,
 		ContentLength: res.Header.ContentLength(),
 	}
 }
 
 type response struct {
 	t             *testing.T
+	Err           error
 	Status        int
 	Body          string
 	Json          typed.Typed
 	ContentLength int
 	Headers       map[string]string
+	Validations   map[string][]typed.Typed
 }
 
 func (r response) ExpectCode(expected int) response {
@@ -215,29 +226,30 @@ func (r response) Inspect() response {
 	return r
 }
 
-func (r response) ExpectValidation(expected ...any) map[string][]typed.Typed {
+func (r response) ExpectValidation(expected ...any) response {
 	r.t.Helper()
 	assert.Equal(r.t, r.Status, 400)
-	r.ExpectCode(20000)
-
-	o := r.Json.Objects("invalid")
-	lookup := make(map[string][]typed.Typed, len(o))
-	for _, o := range o {
-		field := o.String("field")
-		lookup[field] = append(lookup[field], o)
-	}
+	r.ExpectCode(2005)
 
 	valid := true
+	lookup := r.Validations
 	for i := 0; i < len(expected); i += 2 {
+		found := false
 		field := expected[i].(string)
 		expectedCode := expected[i+1].(int)
 		actuals := lookup[field]
 		for _, actual := range actuals {
+			found = true
 			actualCode := actual.Int("code")
 			if expectedCode == actualCode {
 				break
 			}
 			r.t.Errorf("Expect validation code for field '%s' to be %d, got %d", field, expectedCode, actualCode)
+			valid = false
+		}
+
+		if !found {
+			r.t.Errorf("No validation error for field '%s'", field)
 			valid = false
 		}
 	}
@@ -246,7 +258,22 @@ func (r response) ExpectValidation(expected ...any) map[string][]typed.Typed {
 		r.t.FailNow()
 	}
 
-	return lookup
+	return r
+}
+
+func (r response) ExpectNoValidation(fields ...string) response {
+	r.t.Helper()
+	valid := true
+	for _, field := range fields {
+		if invalid, exists := r.Validations[field]; exists {
+			valid = false
+			r.t.Errorf("Did not expect an error for field: '%s', got: '%v'", field, invalid)
+		}
+	}
+	if !valid {
+		r.t.FailNow()
+	}
+	return r
 }
 
 func (r response) OK() response {

@@ -3,11 +3,17 @@ package tests
 import (
 	"math/rand"
 	"unsafe"
+
+	"github.com/google/uuid"
 )
 
 var validChars = []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789[]{}=_!?<>!@#$%^&*() \t\n\r")
 
 type Generator struct{}
+
+func (_ Generator) UUID() string {
+	return uuid.Must(uuid.NewRandom()).String()
+}
 
 // Generate a random string
 // No arguments: 0-200 length

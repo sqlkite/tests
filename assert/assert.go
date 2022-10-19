@@ -29,7 +29,7 @@ func NotEqual[T comparable](t *testing.T, actual T, expected T) {
 	}
 }
 
-func EqualBytes(t *testing.T, actual []byte, expected []byte) {
+func Bytes(t *testing.T, actual []byte, expected []byte) {
 	t.Helper()
 	if bytes.Compare(actual, expected) != 0 {
 		t.Errorf("\nexpected: '%v'\nto equal: '%v'", actual, expected)

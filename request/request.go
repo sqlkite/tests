@@ -279,7 +279,7 @@ func (r response) ExpectNoValidation(fields ...string) response {
 func (r response) OK() response {
 	r.t.Helper()
 	if r.Status != 200 && r.Status != 201 && r.Status != 204 {
-		r.t.Errorf("Expect 200/201/204 status code, got: %d", r.Status)
+		r.t.Errorf("Expect 200/201/204 status code, got: %d\n%s\n%v", r.Status, r.Body, r.Err)
 		r.t.FailNow()
 	}
 	return r

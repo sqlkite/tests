@@ -12,5 +12,5 @@ require (
 	github.com/goccy/go-json v0.9.11 // indirect
 	github.com/klauspost/compress v1.15.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	src.goblgobl.com/sqlite v0.0.0-20221004085915-79e18f2e2ef4 // indirect
+	src.goblgobl.com/sqlite v0.0.0-20221018031914-c4ff3ad281a7 // indirect
 )

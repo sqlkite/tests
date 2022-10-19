@@ -84,7 +84,11 @@ func (r RequestBuilderT[T]) Delete(handler func(*fasthttp.RequestCtx, T) (http.R
 func (r RequestBuilderT[T]) Request(handler func(*fasthttp.RequestCtx, T) (http.Response, error)) response {
 	conn := r.rb.Conn()
 	res, err := handler(conn, r.env)
-	res.Write(conn)
+	if res != nil {
+		res.Write(conn)
+	} else {
+		http.GenericServerError.Write(conn)
+	}
 
 	// r2? really? :dealwithit:
 	r2 := Res(r.rb.t, conn)

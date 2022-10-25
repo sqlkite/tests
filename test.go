@@ -8,17 +8,19 @@ import (
 )
 
 func PG() string {
-	if pg := os.Getenv("GOBL_TEST_PG"); pg != "" {
-		return pg
+	pg := os.Getenv("GOBL_TEST_PG")
+	if pg == "" {
+		pg = "postgres://localhost:5432"
 	}
-	return "postgres://localhost:5432/gobl_test"
+	return pg + "/gobl_test"
 }
 
 func CR() string {
-	if pg := os.Getenv("GOBL_TEST_CR"); pg != "" {
-		return pg
+	cr := os.Getenv("GOBL_TEST_CR")
+	if cr == "" {
+		cr = "postgres://root@localhost:26257"
 	}
-	return "postgres://admin@localhost:26257/gobl_test"
+	return cr + "/gobl_test"
 }
 
 func StorageType() string {

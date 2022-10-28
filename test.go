@@ -26,10 +26,10 @@ func CR() string {
 func StorageType() string {
 	env := strings.ToLower(os.Getenv("GOBL_TEST_STORAGE"))
 	switch env {
-	case "pg":
-		return "pg"
-	case "cr":
-		return "cr"
+	case "postgres":
+		return "postgres"
+	case "cockroach":
+		return "cockroach"
 	case "sqlite", "":
 		return "sqlite"
 	default:
@@ -39,14 +39,14 @@ func StorageType() string {
 
 func StorageConfig() typed.Typed {
 	switch StorageType() {
-	case "pg":
+	case "postgres":
 		return typed.Typed{
-			"type": "pg",
+			"type": "postgres",
 			"url":  PG(),
 		}
-	case "cr":
+	case "cockroach":
 		return typed.Typed{
-			"type": "cr",
+			"type": "cockroach",
 			"url":  CR(),
 		}
 	case "sqlite":

@@ -153,7 +153,7 @@ func Res(t *testing.T, conn *fasthttp.RequestCtx) response {
 	// if we have a validation error, let's parse them into a lookup
 	// of field => code
 	var validations map[string][]typed.Typed
-	if status == 400 && json.Int("code") == 2005 {
+	if status == 400 && json.Int("code") == 2004 {
 		o := json.Objects("invalid")
 		validations = make(map[string][]typed.Typed, len(o))
 		for _, o := range o {
@@ -229,7 +229,7 @@ func (r response) Inspect() response {
 func (r response) ExpectValidation(expected ...any) response {
 	r.t.Helper()
 	assert.Equal(r.t, r.Status, 400)
-	r.ExpectCode(2005)
+	r.ExpectCode(2004)
 
 	valid := true
 	lookup := r.Validations

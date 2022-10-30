@@ -3,6 +3,8 @@ package tests
 import (
 	"os"
 	"strings"
+
+	"src.goblgobl.com/utils/log"
 )
 
 func PG() string {
@@ -33,4 +35,15 @@ func StorageType() string {
 	default:
 		panic("Unknown GOBL_TEST_STORAGE value. Should be one of: pg, cr, sqlite (default)")
 	}
+}
+
+func CaptureLog(fn func()) string {
+	defer func() {
+		log.Out = os.Stderr
+	}()
+
+	str := &strings.Builder{}
+	log.Out = str
+	fn()
+	return str.String()
 }

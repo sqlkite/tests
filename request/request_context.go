@@ -87,7 +87,7 @@ func (r RequestBuilderT[T]) Request(handler func(*fasthttp.RequestCtx, T) (http.
 	if res != nil {
 		res.Write(conn)
 	} else {
-		http.GenericServerError.Write(conn)
+		http.ServerError().Write(conn)
 	}
 
 	// r2? really? :dealwithit:

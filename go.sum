@@ -24,9 +24,5 @@ golang.org/x/term v0.0.0-20210927222741-03fcf44c2211/go.mod h1:jbD1KX2456YbFQfuX
 golang.org/x/text v0.3.6/go.mod h1:5Zoc/QRtKVWzQhOtBMvqHzDpF6irO9z98xDceosuGiQ=
 golang.org/x/text v0.3.7/go.mod h1:u+2+/6zg+i71rQMx5EYifcz6MCKuco9NR6JIITiCfzQ=
 golang.org/x/tools v0.0.0-20180917221912-90fa682c2a6e/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
-src.goblgobl.com/sqlite v0.0.0-20221004085915-79e18f2e2ef4 h1:lfwMvbUvNJBEyJ6+eZH1F3B2j4Oy/d1ArfwEGMr0Z2I=
-src.goblgobl.com/sqlite v0.0.0-20221004085915-79e18f2e2ef4/go.mod h1:R2PshReaqmuRhSdMawsqw5PK15LWT5CgoCvkWUi0nuk=
-src.goblgobl.com/sqlite v0.0.0-20221018031914-c4ff3ad281a7 h1:t2lShl5qjTWvyv5+vOEAy0p+XrLfKfMMN9cUNePW6A0=
-src.goblgobl.com/sqlite v0.0.0-20221018031914-c4ff3ad281a7/go.mod h1:R2PshReaqmuRhSdMawsqw5PK15LWT5CgoCvkWUi0nuk=
-src.goblgobl.com/utils v0.0.0-20221007051551-797e6fdf78f7 h1:5tlMvtbEIiAxjVp4/KIbOZfoEcYoX2Ts4TnNnBsh5l0=
-src.goblgobl.com/utils v0.0.0-20221007051551-797e6fdf78f7/go.mod h1:FlqsPX/DKfz+211+SvgKIzP2dJq6gmGe/QI6NkmrygY=
+src.goblgobl.com/utils v0.0.0-20221101045450-179c536246d9 h1:egrRnwsYg/gUiep54wPOJ1N4dvXqbIZYB/St1EEH1a4=
+src.goblgobl.com/utils v0.0.0-20221101045450-179c536246d9/go.mod h1:hJLwI45ZFcJa74yeNv8ah9OkONeJhsLcdgxZBwqRiN4=

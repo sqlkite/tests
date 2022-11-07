@@ -50,8 +50,8 @@ func (r RequestBuilderT[T]) ProjectId(id string) RequestBuilderT[T] {
 	return r
 }
 
-func (r RequestBuilderT[T]) Query(key string, value string) RequestBuilderT[T] {
-	r.rb = r.rb.Query(key, value)
+func (r RequestBuilderT[T]) Query(query map[string]string) RequestBuilderT[T] {
+	r.rb = r.rb.Query(query)
 	return r
 }
 

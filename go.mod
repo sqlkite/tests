@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/google/uuid v1.3.0
 	github.com/valyala/fasthttp v1.41.0
-	src.goblgobl.com/utils v0.0.1
+	src.goblgobl.com/utils v0.0.4
 )
 
 require (

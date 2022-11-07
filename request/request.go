@@ -62,8 +62,10 @@ func (r RequestBuilder) ProjectId(id string) RequestBuilder {
 	return r.Header("Gobl-Project", id)
 }
 
-func (r RequestBuilder) Query(key string, value string) RequestBuilder {
-	r.query.Add(key, value)
+func (r RequestBuilder) Query(query map[string]string) RequestBuilder {
+	for k, v := range query {
+		r.query.Add(k, v)
+	}
 	return r
 }
 

@@ -2,10 +2,48 @@ package tests
 
 import (
 	"os"
+	"regexp"
 	"strings"
 
 	"src.goblgobl.com/utils/log"
+	"src.goblgobl.com/utils/typed"
 )
+
+var PlaceholderPattern = regexp.MustCompile(`\$(\d+)`)
+
+type TestableDB interface {
+	Placeholder(i int) string
+	IsNotFound(err error) bool
+	RowToMap(sql string, args ...any) (typed.Typed, error)
+	RowsToMap(sql string, args ...any) ([]typed.Typed, error)
+}
+
+func Row(db TestableDB, sql string, args ...any) typed.Typed {
+	// no one's going to like this, but not sure how else to deal with it
+	if db.Placeholder(0) == "?1" {
+		sql = PlaceholderPattern.ReplaceAllString(sql, "?$1")
+	}
+	row, err := db.RowToMap(sql, args...)
+	if err != nil {
+		if db.IsNotFound(err) {
+			return nil
+		}
+		panic(err)
+	}
+	return row
+}
+
+func Rows(db TestableDB, sql string, args ...any) []typed.Typed {
+	// no one's going to like this, but not sure how else to deal with it
+	if db.Placeholder(0) == "?1" {
+		sql = PlaceholderPattern.ReplaceAllString(sql, "?$1")
+	}
+	rows, err := db.RowsToMap(sql, args...)
+	if err != nil {
+		panic(err)
+	}
+	return rows
+}
 
 func PG() string {
 	pg := os.Getenv("GOBL_TEST_PG")

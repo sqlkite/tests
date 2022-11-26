@@ -24,7 +24,7 @@ type Table struct {
 	Insert   func(args ...any) typed.Typed
 }
 
-func NewTable(name string, builder func(KV) KV) Table {
+func NewTable(name string, builder func(KV) KV, pks ...string) Table {
 	obj := builder(KV{})
 	keys := make([]string, len(obj))
 	placeholders := make([]string, len(obj))
@@ -37,7 +37,14 @@ func NewTable(name string, builder func(KV) KV) Table {
 	}
 
 	insertSQL := "insert into " + name + " (" + strings.Join(keys, ",") + ")"
-	insertSQL += " values (" + strings.Join(placeholders, ",") + ")"
+	insertSQL += "\nvalues (" + strings.Join(placeholders, ",") + ")"
+	if len(pks) > 0 {
+		insertSQL += "\non conflict (" + strings.Join(pks, ",") + ") do update set "
+		insertSQL += keys[0] + " = excluded." + keys[0]
+		for _, k := range keys[1:] {
+			insertSQL += ", " + k + " = excluded." + k
+		}
+	}
 
 	deleteSQL := "delete from " + name
 

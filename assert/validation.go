@@ -1,7 +1,7 @@
 package assert
 
 /*
-Helper to validation a src.goblgobl.com/utils/validation.Result
+Helper to validation a src.sqlkite.com/utils/validation.Result
 but using reflection so we don't create a cyclical dependency
 (ya, that's normal...)
 */

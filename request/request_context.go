@@ -18,7 +18,7 @@ import (
 	"testing"
 
 	"github.com/valyala/fasthttp"
-	"src.goblgobl.com/utils/http"
+	"src.sqlkite.com/utils/http"
 )
 
 func ReqT[T any](t *testing.T, env T) RequestBuilderT[T] {
@@ -57,6 +57,11 @@ func (r RequestBuilderT[T]) Query(query map[string]string) RequestBuilderT[T] {
 
 func (r RequestBuilderT[T]) Body(body any) RequestBuilderT[T] {
 	r.rb = r.rb.Body(body)
+	return r
+}
+
+func (r RequestBuilderT[T]) UserValue(key string, value any) RequestBuilderT[T] {
+	r.rb = r.rb.UserValue(key, value)
 	return r
 }
 

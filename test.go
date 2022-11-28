@@ -5,8 +5,8 @@ import (
 	"regexp"
 	"strings"
 
-	"src.goblgobl.com/utils/log"
-	"src.goblgobl.com/utils/typed"
+	"src.sqlkite.com/utils/log"
+	"src.sqlkite.com/utils/typed"
 )
 
 var PlaceholderPattern = regexp.MustCompile(`\$(\d+)`)
@@ -46,23 +46,23 @@ func Rows(db TestableDB, sql string, args ...any) []typed.Typed {
 }
 
 func PG() string {
-	pg := os.Getenv("GOBL_TEST_PG")
+	pg := os.Getenv("SQLKITE_TEST_PG")
 	if pg == "" {
 		pg = "postgres://localhost:5432"
 	}
-	return pg + "/gobl_test"
+	return pg + "/sqlkite_test"
 }
 
 func CR() string {
-	cr := os.Getenv("GOBL_TEST_CR")
+	cr := os.Getenv("SQLKITE_TEST_CR")
 	if cr == "" {
 		cr = "postgres://root@localhost:26257"
 	}
-	return cr + "/gobl_test"
+	return cr + "/sqlkite_test"
 }
 
 func StorageType() string {
-	env := strings.ToLower(os.Getenv("GOBL_TEST_STORAGE"))
+	env := strings.ToLower(os.Getenv("SQLKITE_TEST_STORAGE"))
 	switch env {
 	case "postgres":
 		return "postgres"
@@ -71,7 +71,7 @@ func StorageType() string {
 	case "sqlite", "":
 		return "sqlite"
 	default:
-		panic("Unknown GOBL_TEST_STORAGE value. Should be one of: pg, cr, sqlite (default)")
+		panic("Unknown SQLKITE_TEST_STORAGE value. Should be one of: pg, cr, sqlite (default)")
 	}
 }
 

@@ -6,10 +6,10 @@ import (
 	"strings"
 	"testing"
 
-	"src.goblgobl.com/tests/assert"
-	"src.goblgobl.com/utils/http"
-	"src.goblgobl.com/utils/json"
-	"src.goblgobl.com/utils/typed"
+	"src.sqlkite.com/tests/assert"
+	"src.sqlkite.com/utils/http"
+	"src.sqlkite.com/utils/json"
+	"src.sqlkite.com/utils/typed"
 
 	"github.com/valyala/fasthttp"
 )
@@ -18,10 +18,11 @@ type Handler func(*fasthttp.RequestCtx)
 
 func Req(t *testing.T) RequestBuilder {
 	return RequestBuilder{
-		t:       t,
-		path:    "/",
-		query:   make(url.Values),
-		headers: make(map[string]string),
+		t:          t,
+		path:       "/",
+		query:      make(url.Values),
+		headers:    make(map[string]string),
+		userValues: make(map[string]any),
 	}
 }
 
@@ -34,13 +35,14 @@ func Response(t *testing.T, res http.Response) response {
 }
 
 type RequestBuilder struct {
-	t       *testing.T
-	host    string
-	body    string
-	path    string
-	method  string
-	query   url.Values
-	headers map[string]string
+	t          *testing.T
+	host       string
+	body       string
+	path       string
+	method     string
+	query      url.Values
+	headers    map[string]string
+	userValues map[string]any
 }
 
 func (r RequestBuilder) Path(path string) RequestBuilder {
@@ -79,6 +81,11 @@ func (r RequestBuilder) Body(body any) RequestBuilder {
 		}
 		r.body = string(data)
 	}
+	return r
+}
+
+func (r RequestBuilder) UserValue(key string, value any) RequestBuilder {
+	r.userValues[key] = value
 	return r
 }
 
@@ -125,7 +132,7 @@ func (r RequestBuilder) Conn() *fasthttp.RequestCtx {
 	if h := r.host; h != "" {
 		uri += h
 	} else {
-		uri += "test.goblgobl.local"
+		uri += "test.sqlkite.local"
 	}
 	uri += r.path
 	if len(r.query) > 0 {
@@ -133,9 +140,15 @@ func (r RequestBuilder) Conn() *fasthttp.RequestCtx {
 	}
 	request.SetRequestURI(uri)
 
-	return &fasthttp.RequestCtx{
+	ctx := &fasthttp.RequestCtx{
 		Request: *request,
 	}
+
+	for key, value := range r.userValues {
+		ctx.SetUserValue(key, value)
+	}
+
+	return ctx
 }
 
 func Res(t *testing.T, conn *fasthttp.RequestCtx) response {

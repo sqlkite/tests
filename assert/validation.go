@@ -98,6 +98,33 @@ func (v *v) Field(expectedField string, meta any, data ...map[string]any) *v {
 	return v
 }
 
+func (v *v) FieldMessage(expectedField string, expectedMessage string) *v {
+	t := v.t
+	t.Helper()
+
+	for _, error := range v.errors {
+		field := error["fields"]
+		indexes := error["indexes"]
+
+		if !v.isCorrectField(field, indexes, expectedField) {
+			continue
+		}
+		fmt.Println(error["error"].(string) == expectedMessage)
+		if error["error"].(string) != expectedMessage {
+			continue
+		}
+		return v
+	}
+
+	err := "\nexpected validation error message:\n"
+	err += fmt.Sprintf("  field=%s\n", expectedField)
+	err += fmt.Sprintf("  message=%s\n", expectedMessage)
+	err += fmt.Sprintf("got: %s", string(v.json))
+	t.Error(err)
+	t.FailNow()
+	return v
+}
+
 func (v *v) FieldsHaveNoErrors(noFields ...string) *v {
 	t := v.t
 	t.Helper()

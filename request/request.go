@@ -61,7 +61,7 @@ func (r RequestBuilder) Header(key string, value string) RequestBuilder {
 }
 
 func (r RequestBuilder) ProjectId(id string) RequestBuilder {
-	return r.Header("Gobl-Project", id)
+	return r.Header("Project", id)
 }
 
 func (r RequestBuilder) Query(query map[string]string) RequestBuilder {

@@ -10,6 +10,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"strconv"
+	"strings"
 	"testing"
 )
 
@@ -63,11 +65,12 @@ func (v *v) Field(expectedField string, meta any, data ...map[string]any) *v {
 
 	for _, error := range v.errors {
 		data := error["data"]
-		field := error["field"]
-		if field == nil && expectedField != "" && field.(string) != expectedField {
+		field := error["fields"]
+		indexes := error["indexes"]
+
+		if !v.isCorrectField(field, indexes, expectedField) {
 			continue
 		}
-
 		if int(error["code"].(float64)) != expectedCode {
 			continue
 		}
@@ -105,11 +108,43 @@ func (v *v) FieldsHaveNoErrors(noFields ...string) *v {
 			continue
 		}
 		for _, noField := range noFields {
-			if field == noField {
+			if v.isCorrectField(field, error["indexes"], noField) {
 				t.Errorf("Expected no error for field '%s', but got:\n%v", field, error)
 				t.FailNow()
 			}
 		}
 	}
 	return v
+}
+
+func (_ *v) isCorrectField(actual any, indexesRaw any, expectedField string) bool {
+	if actual == nil && expectedField == "" {
+		return true
+	}
+
+	parts := actual.([]interface{})
+	expected := strings.Split(expectedField, ".")
+
+	if len(parts) != len(expected) {
+		return false
+	}
+
+	var indexes []interface{}
+	indexPosition := 0
+	if indexesRaw != nil {
+		indexes = indexesRaw.([]interface{})
+	}
+
+	for i, part := range parts {
+		p := part.(string)
+		if p == "#" {
+			p = strconv.Itoa(int(indexes[indexPosition].(float64)))
+			indexPosition += 1
+		}
+		if p != expected[i] {
+			return false
+		}
+	}
+
+	return true
 }
